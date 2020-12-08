@@ -17,11 +17,11 @@ def computePart1(luggages, containers):
 
 
 def computePart2(luggages, bag):
-	part2 = 0
 	if luggages[bag] == {}:
 		return 0
 
 	else:
+		part2 = 0
 		for bagColor, number in luggages[bag].items():
 			part2 += number + number * computePart2(luggages, bagColor)
 		return part2
