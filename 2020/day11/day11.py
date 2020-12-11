@@ -9,7 +9,7 @@ def checkIndex(pos, sizeLines, sizeColumns):
 
 
 # if all valid neighbours seats are occupied return true
-def getNeighoursOcupation(seatsMap, seatPosition, linesNr, columnsNr):
+def getNeighoursOcupationPart1(seatsMap, seatPosition, linesNr, columnsNr):
 	line = seatPosition[0]
 	column = seatPosition[1]
 	up = line - 1
@@ -44,11 +44,74 @@ def computePart1(seatsMap):
 	while True:
 		for i in range(linesNr):
 			for j in range(columnsNr):
-				if local_map[i][j] == 'L' and getNeighoursOcupation(local_map, (i,j), linesNr, columnsNr) == 0:
+				if local_map[i][j] == 'L' and getNeighoursOcupationPart1(local_map, (i,j), linesNr, columnsNr) == 0:
 					# occupy seat
 					new_map[i][j] = '#'
 
-				elif local_map[i][j] == '#' and getNeighoursOcupation(local_map, (i,j), linesNr, columnsNr) >= 4:
+				elif local_map[i][j] == '#' and getNeighoursOcupationPart1(local_map, (i,j), linesNr, columnsNr) >= 4:
+					# free the seat
+					new_map[i][j] = 'L'
+
+		if new_map == local_map:
+			break
+		else:
+			local_map =  copy.deepcopy(new_map)
+
+	occupiedSeats = 0
+	for row in local_map:
+		occupiedSeats += row.count('#')
+
+	return occupiedSeats
+
+
+
+# if all valid neighbours seats are occupied return true
+def getNeighoursOcupationPart2(seatsMap, seatPosition, linesNr, columnsNr):
+	line = seatPosition[0]
+	column = seatPosition[1]
+	up = -1
+	down = 1
+	left = -1
+	right = 1
+
+	# all 8 neighbours
+	directions = [(0, left), (up, left), (up, 0), (up, right),
+				  (0, right), (down, right), (down, 0), (down, left)]
+	
+	occupiedSeats = 0
+	for direction in directions:
+		pos_X = line + direction[0]
+		pos_Y = column + direction[1]
+
+		while checkIndex((pos_X, pos_Y), linesNr, columnsNr):
+			if seatsMap[pos_X][pos_Y] == '#':
+				occupiedSeats += 1
+				break
+
+			elif seatsMap[pos_X][pos_Y] == 'L':
+				break
+			
+			pos_X += direction[0]
+			pos_Y += direction[1]
+	
+	return occupiedSeats
+
+
+def computePart2(seatsMaps):
+	local_map = seatsMap
+	linesNr = len(seatsMap)
+	columnsNr = len(seatsMap[0])
+
+	new_map = [[ '.' for i in range(columnsNr) ] for j in range(linesNr)]
+
+	while True:
+		for i in range(linesNr):
+			for j in range(columnsNr):
+				if local_map[i][j] == 'L' and getNeighoursOcupationPart2(local_map, (i,j), linesNr, columnsNr) == 0:
+					# occupy seat
+					new_map[i][j] = '#'
+
+				elif local_map[i][j] == '#' and getNeighoursOcupationPart2(local_map, (i,j), linesNr, columnsNr) >= 5:
 					# free the seat
 					new_map[i][j] = 'L'
 
@@ -83,3 +146,4 @@ if __name__ == "__main__":
 	# printMap(seatsMap)
 
 	print("Part1: " + str(computePart1(seatsMap)))	
+	print("Part2: " + str(computePart2(seatsMap)))	
